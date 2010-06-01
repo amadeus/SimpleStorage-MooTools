@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>SimpleStorage</title>
+	<script src="mootools.js" type="text/javascript" charset="utf-8"></script>
+	<script src="simpleStorage.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+		window.$$$ = new SimpleStorage({
+			mode:'cookie'
+		});
+		
+		window.$$$.set({
+			'cool':20,
+			'sweet':'sauce',
+			'obj':{
+				somethingTrue:true,
+				somethingFalse:false
+			}
+		});
+		
+		//console.log(window.$$$.get('sweet'));
+		//console.log(window.$$$.get());
+	</script>
+</head>
+<body>
+</body>
+</html>
