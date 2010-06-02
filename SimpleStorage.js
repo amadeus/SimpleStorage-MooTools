@@ -1,6 +1,3 @@
-/**
-	SimpleStorage
-*/
 var SimpleStorage = new Class({
 	Implements:[Options,Events],
 
