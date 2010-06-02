@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>SimpleStorage</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools-yui-compressed.js"></script>
+	<script src="../Source/SimpleStorage.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+		var storageExample = new SimpleStorage({
+			mode:'cookies'
+		});
+		
+		storageExample.set({
+			'cool':20,
+			'sweet':'sauce',
+			'obj':{
+				somethingTrue:true,
+				somethingFalse:false
+			}
+		});
+	</script>
+</head>
+<body>
+</body>
+</html>
