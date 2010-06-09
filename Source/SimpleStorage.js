@@ -3,7 +3,8 @@ var SimpleStorage = new Class({
 
 	options:{
 		mode:'sessionStorage',
-		storageRef:'SimpleStorageRef'
+		storageRef:'SimpleStorageRef',
+		prefix:'ss_'
 	},
 
 	_data:{},
@@ -13,6 +14,8 @@ var SimpleStorage = new Class({
 
 	initialize:function(options){
 		this.setOptions(options);
+
+		this.options.storageRef = this.options.prefix+this.options.storageRef;
 
 		if(this.options.mode === 'sessionStorage' || this.options.mode === 'localStorage') {
 			try {
@@ -29,13 +32,12 @@ var SimpleStorage = new Class({
 		}
 
 		if(this.options.mode === 'cookie' || this.options.mode === 'cookies'){
+			var currentRef = JSON.decode(Cookie.read(this.options.storageRef));
 			var type = $type(currentRef);
 
-			var currentRef = JSON.decode(Cookie.read(this.options.storageRef));
-
-			if($type(currentRef)!=='array'){
+			if(type!=='array'){
 				Cookie.write(this.options.storageRef,JSON.encode([]));
-				
+
 				currentRef = $A([]);
 			}
 
@@ -59,10 +61,9 @@ var SimpleStorage = new Class({
 
 	initCookies:function(){
 		var currentRef = this.currentCookies;
-		
-		console.log(currentRef);
-		
-		if($type(currentRef)!=='array') currentRef = $A([]);
+		var type = $type(currentRef);
+
+		if(type!=='array') currentRef = $A([]);
 
 		currentRef.each(function(name){
 			this.getCookie(name);
@@ -90,19 +91,19 @@ var SimpleStorage = new Class({
 			if($type(currentRef)!=='array') currentRef = $A([]);
 
 			currentRef.each(function(name){
-				retObj[name] = JSON.decode(this._data.getItem(name));
+				retObj[name] = JSON.decode(this._data.getItem(this.options.prefix+name));
 			},this);
 
 			return retObj;
 		}
 
-		return JSON.decode(this._data.getItem(key));
+		return JSON.decode(this._data.getItem(this.options.prefix+key));
 	},
 
 	getCookie:function(key){
 		if(!key) return this.getData();
 
-		var cookie = JSON.decode(Cookie.read(key));
+		var cookie = JSON.decode(Cookie.read(this.options.prefix+key));
 
 		var data = this.getData(key);
 
@@ -129,7 +130,7 @@ var SimpleStorage = new Class({
 		$extend(this._data,newObj);
 
 		this.fireEvent('set',arguments);
-		
+
 		return true;
 	},
 
@@ -144,19 +145,19 @@ var SimpleStorage = new Class({
 
 		if(type==='string' && arguments.length==2){
 			currentRef[currentRef.length] = arguments[0];
-			this._data.setItem(arguments[0],JSON.encode(arguments[1]));
+			this._data.setItem(this.options.prefix+arguments[0],JSON.encode(arguments[1]));
 		}
 
 		if(type==='object')
 			$each(arguments[0],function(item,index,obj){
 				currentRef[currentRef.length] = index;
-				this._data.setItem(index,JSON.encode(item));
+				this._data.setItem(this.options.prefix+index,JSON.encode(item));
 			},this);
 
 		this._data.setItem(this.options.storageRef,JSON.encode(currentRef));
 
 		this.fireEvent('set',arguments);
-		
+
 		return true;
 	},
 
@@ -169,14 +170,14 @@ var SimpleStorage = new Class({
 
 		if(type==='string' && arguments.length==2){
 			if(currentRef.indexOf(arguments[0])===-1) currentRef[currentRef.length] = arguments[0];
-			Cookie.write(arguments[0],JSON.encode(arguments[1]));
+			Cookie.write(this.options.prefix+arguments[0],JSON.encode(arguments[1]));
 		}
 
 		if(type==='object'){
 			$each(arguments[0],function(item,index,obj){
 				if(currentRef.indexOf(index)===-1) currentRef[currentRef.length] = index;
-				Cookie.write(index,JSON.encode(item));
-			});
+				Cookie.write(this.options.prefix+index,JSON.encode(item));
+			},this);
 		}
 
 		this.setCookieRef(currentRef);
@@ -199,7 +200,7 @@ var SimpleStorage = new Class({
 		},this);
 
 		this.fireEvent('remove',keys);
-		
+
 		return true;
 	},
 
@@ -212,7 +213,7 @@ var SimpleStorage = new Class({
 
 		if(keys.length===0){
 			currentRef.each(function(name){
-				this._data.removeItem(name);
+				this._data.removeItem(this.options.prefix+name);
 			},this);
 
 			currentRef = [];
@@ -220,13 +221,13 @@ var SimpleStorage = new Class({
 
 		else keys.each(function(name,index){
 			currentRef.splice(currentRef.indexOf(name),1);
-			this._data.removeItem(name);
+			this._data.removeItem(this.options.prefix+name);
 		},this);
 
 		this._data.setItem(this.options.storageRef,JSON.encode(currentRef));
 
 		this.fireEvent('remove',keys);
-		
+
 		return true;
 	},
 
@@ -246,14 +247,14 @@ var SimpleStorage = new Class({
 		this.setCookieRef(currentRef);
 
 		this.fireEvent('remove',keys);
-		
+
 		return true;
 	},
 
 	removeCookie:function(key,currentRef){
 		currentRef.splice(currentRef.indexOf(key),1);
 		delete this._data[key];
-		return Cookie.dispose(key);
+		return Cookie.dispose(this.options.prefix+key);
 	},
 
 	setCookieRef:function(data){

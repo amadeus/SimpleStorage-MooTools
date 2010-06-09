@@ -7,10 +7,24 @@
 	<script src="../Source/SimpleStorage.js" type="text/javascript" charset="utf-8"></script>
 	<script>
 		var storageExample = new SimpleStorage({
-			mode:'cookies'
+			mode:'sessionStorage'
 		});
-		
+
 		storageExample.set({
+			'cool':20,
+			'sweet':'sauce',
+			'obj':{
+				somethingTrue:true,
+				somethingFalse:false
+			}
+		});
+
+		var storageExample2 = new SimpleStorage({
+			mode:'sessionStorage',
+			prefix:'ss1_'
+		});
+
+		storageExample2.set({
 			'cool':20,
 			'sweet':'sauce',
 			'obj':{
